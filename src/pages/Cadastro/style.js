@@ -5,6 +5,7 @@ export const styles = StyleSheet.create({
     container:{
         alignItems:"center"
     },
+    
     imagemCadastro:{
         marginTop:150
     },
@@ -23,6 +24,7 @@ export const styles = StyleSheet.create({
         marginTop:25,
         marginBottom:40
     },
+    
     inputNome:{
         backgroundColor: '#e6e6e6',
         width: '75%',
@@ -79,16 +81,19 @@ export const styles = StyleSheet.create({
         marginTop:30,
         marginBottom:20
     },
+
     loginTexto:{
         marginTop: 10,
         color:'#A9A9A9',
         fontSize: 18,
     },
+
     login:{
         color:'#000000',
         fontWeight:"400",
         textDecorationLine: "underline",
     }
-    });
+
+});
 
 export default styles

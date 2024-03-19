@@ -12,6 +12,19 @@ export default function Cadastro({ navigation }) {
     const [password, setPassword] = useState('');
     const [confirmarSenha, setConfirmarSenha] = useState('');
 
+    function validarNomeCompleto(nomeCompleto) {
+        if (nomeCompleto.trim() === '') {
+            return false; 
+        }
+
+        const regexNome = /^[A-Z][a-z]*( [A-Z][a-z]*)+$/;
+        if (!regexNome.test(nomeCompleto)) {
+            return false; 
+        }
+
+        return true;
+    }
+
     function validarSenha(senha) {
         const regexMaiuscula = /[A-Z]/;
         if (!regexMaiuscula.test(senha)) {
@@ -47,7 +60,13 @@ export default function Cadastro({ navigation }) {
         }
 
         try {
-            await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            await db.collection('users').doc(user.uid).set({
+                nomeCompleto: nomeCompleto,
+                email: email
+            });
             Alert.alert('Senha de segurança forte!');
             Alert.alert('Cadastro criado com sucesso!');
             setNomeCompleto('');

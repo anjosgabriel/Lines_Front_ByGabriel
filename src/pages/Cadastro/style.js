@@ -61,6 +61,12 @@ export const styles = StyleSheet.create({
         shadowOpacity: 0.3
         },
 
+        olho:{
+            marginTop: -45,
+            marginBottom: 20,
+            marginLeft: 230,
+            },
+
     inputConfirmar:{
         backgroundColor: '#e6e6e6',
         width: '75%',

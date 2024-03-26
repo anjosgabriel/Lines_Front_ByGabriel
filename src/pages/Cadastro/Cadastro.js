@@ -1,16 +1,17 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Alert } from 'react-native';
+import { View, Text, TextInput, Alert, TouchableOpacity } from 'react-native';
 import styles from "../Cadastro/style";
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../Componentes/Firebase/Firebase';
+import { auth, db } from '../../Componentes/Firebase/Firebase';
 import { Button } from "react-native-elements";
-
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Cadastro({ navigation }) {
     const [nomeCompleto, setNomeCompleto] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmarSenha, setConfirmarSenha] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     function validarNomeCompleto(nomeCompleto) {
         if (nomeCompleto.trim() === '') {
@@ -49,6 +50,11 @@ export default function Cadastro({ navigation }) {
     }
 
     async function createUser() {
+        if (!validarNomeCompleto(nomeCompleto)) {
+            Alert.alert('Nome inválido!', 'Por favor, insira um nome válido.');
+            return;
+        }
+
         if (!validarSenha(password)) {
             Alert.alert('Senha inválida!', 'A senha deve conter pelo menos uma letra maiúscula, letras e números, pelo menos um caractere especial, e ter de 8 a 12 caracteres.');
             return;
@@ -60,19 +66,23 @@ export default function Cadastro({ navigation }) {
         }
 
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email.toLowerCase(), password);
             const user = userCredential.user;
 
-            await db.collection('users').doc(user.uid).set({
-                nomeCompleto: nomeCompleto,
-                email: email
-            });
-            Alert.alert('Senha de segurança forte!');
-            Alert.alert('Cadastro criado com sucesso!');
-            setNomeCompleto('');
-            setEmail('');
-            setPassword('');
-            setConfirmarSenha('');
+            if (user) {
+                await db.collection('users').doc(user.uid).set({
+                    nomeCompleto: nomeCompleto,
+                    email: email.toLowerCase()
+                });
+                Alert.alert('Senha de segurança forte!');
+                Alert.alert('Cadastro criado com sucesso!');
+                setNomeCompleto('');
+                setEmail('');
+                setPassword('');
+                setConfirmarSenha('');
+            } else {
+                Alert.alert('Erro ao criar usuário!', 'Usuário não encontrado.');
+            }
         } catch (error) {
             console.error('Erro ao criar usuário:', error);
             Alert.alert('Erro ao criar usuário:', error.message);
@@ -97,6 +107,8 @@ export default function Cadastro({ navigation }) {
                 value={email}
                 onChangeText={value => setEmail(value)}
                 style={styles.inputEmail}
+                autoCapitalize='none'
+                autoCorrect={false}
             />
 
             <TextInput 
@@ -106,8 +118,14 @@ export default function Cadastro({ navigation }) {
                 onChangeText={value => setPassword(value)}
                 style={styles.inputSenha}
                 maxLength={12}
-                secureTextEntry={true}
+                secureTextEntry={!showPassword}
             />
+
+            <TouchableOpacity
+                style={styles.olho}
+                onPress={() => setShowPassword(!showPassword)}>
+                <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="#6d6d6d" />
+            </TouchableOpacity>
 
             <TextInput 
                 placeholder="Confirmar Senha"
@@ -116,8 +134,14 @@ export default function Cadastro({ navigation }) {
                 onChangeText={value => setConfirmarSenha(value)}
                 style={styles.inputConfirmar}
                 maxLength={12} 
-                secureTextEntry={true}
+                secureTextEntry={!showPassword}
             />
+
+            <TouchableOpacity
+                style={styles.olho}
+                onPress={() => setShowPassword(!showPassword)}>
+                <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="#6d6d6d" />
+            </TouchableOpacity>
 
             <Button
                 buttonStyle={styles.button} 
@@ -131,7 +155,6 @@ export default function Cadastro({ navigation }) {
                 Já possui conta?
                 <Text style={styles.login}> Login</Text>
             </Text> 
-            
         </View>
     )
 }

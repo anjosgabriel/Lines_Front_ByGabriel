@@ -22,6 +22,7 @@ export const styles = StyleSheet.create({
         shadowOffset: { height: 0 }, 
         shadowOpacity: 0.3
     },
+
     input2: {
         marginTop: 16,
         backgroundColor: '#e6e6e6',
